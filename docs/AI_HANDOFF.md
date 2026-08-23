@@ -102,13 +102,19 @@ gets used again.
 
 - Patient registration flow's full happy path (photo → photo → OCR → phone → review → save → HN) has NOT been
   completed with a real save yet — verified through photo capture + OCR (both steps, on production, zero
-  console errors) but not through phone/review/save. **A real production bug was found and fixed along the
-  way**: `src/lib/supabase/env.ts` read `NEXT_PUBLIC_*` vars via a dynamic `process.env[name]` lookup, which
-  Next.js cannot statically inline into the browser bundle — every client-side Supabase call (photo upload
-  during registration, patient/appointment search) threw `Missing required environment variable
-  NEXT_PUBLIC_SUPABASE_URL` in the browser, even though the var was correctly set everywhere. Fixed by using a
-  literal `process.env.NEXT_PUBLIC_SUPABASE_URL` access per var; verified by grepping the real URL into the
-  built client chunk and replaying the flow with zero errors, then redeployed. See `docs/DECISIONS.md`.
+  console errors, including a synthetic 15MB stress-test photo) but not through phone/review/save. **Two real
+  production bugs were found and fixed along the way** (both via `vercel logs`, not guesswork):
+  1. `src/lib/supabase/env.ts` read `NEXT_PUBLIC_*` vars via a dynamic `process.env[name]` lookup, which
+     Next.js cannot statically inline into the browser bundle — every client-side Supabase call (photo upload
+     during registration, patient/appointment search) threw `Missing required environment variable
+     NEXT_PUBLIC_SUPABASE_URL` in the browser, even though the var was correctly set everywhere.
+  2. A real camera photo (several MB) exceeded Next.js Server Actions' default 1MB body limit, so
+     `extractIdCardOcr` failed with a 413 before ever reaching Claude — surfaced to the user only as the
+     generic "อ่านข้อมูลจากบัตรไม่สำเร็จ" toast. Fixed with client-side compression
+     (`src/lib/image/compress.ts`, canvas-based resize+re-encode before `onCapture` fires in
+     `camera-capture.tsx`) plus a raised `serverActions.bodySizeLimit` in `next.config.ts` as headroom.
+  Both verified end-to-end on production (not just locally) with Playwright before being called done. See
+  `docs/DECISIONS.md` for both.
 - Appointments: `updateAppointmentStatus` (mark completed/cancelled/no-show) still has no UI hookup.
 - No staff sign-up UI — new staff accounts currently require either the Supabase dashboard or an admin-API
   call like the one used to create the first account.

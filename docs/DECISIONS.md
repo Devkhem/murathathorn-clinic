@@ -7,6 +7,36 @@ documentation conflict, the newest approved decision here wins — update the re
 
 ## Decision
 
+Compress patient photos client-side (`src/lib/image/compress.ts` — canvas resize to max 1600px + JPEG
+re-encode at quality 0.82) before they're used anywhere, wired into `camera-capture.tsx` so both the face photo
+and ID card photo steps get it automatically. Also raised `next.config.ts`'s
+`experimental.serverActions.bodySizeLimit` from the 1MB default to `4mb` as headroom.
+
+## Reason
+
+The user reported the ID card OCR step failing on a real photo. `vercel logs` showed the actual cause: `Error:
+Body exceeded 1 MB limit` — a real camera photo from a phone/iPad is routinely several MB, well past Next.js
+Server Actions' default limit, so `extractIdCardOcr(image)` was rejected before the image ever reached Claude.
+Raising the limit alone would only push the ceiling, not remove it (Vercel's serverless functions also have
+their own hard payload ceiling) — and there's no reason to ship a multi-MB photo to `patient-photos`/
+`patient-id-cards` storage or to the OCR API when a few hundred KB is visually and functionally equivalent for
+both storage and text extraction. Compression fixes the problem at the source instead of just moving the wall.
+
+## Impact
+
+`src/lib/image/compress.ts` (new), `src/features/patients/components/camera-capture.tsx` (calls it before
+`onCapture` fires, with a spinner over the preview while it runs), `next.config.ts`. Verified with a synthetic
+15MB test photo (deliberately larger than a typical real camera photo) against both local dev and the live
+production deployment — the same file that previously failed instantly now completes OCR with zero errors.
+
+## Date
+
+2026-08-24
+
+---
+
+## Decision
+
 Fixed `src/lib/supabase/env.ts` to read each `NEXT_PUBLIC_*` env var via a literal `process.env.NEXT_PUBLIC_X`
 property access instead of a shared dynamic `requireEnv(name)` helper that did `process.env[name]`.
 
