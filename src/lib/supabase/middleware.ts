@@ -11,9 +11,19 @@ function isPublicPath(pathname: string) {
 }
 
 /**
- * Refreshes the Supabase session on every request and redirects unauthenticated
- * users away from protected pages. This is a UX convenience, not the real security
- * boundary — RLS is. Called from middleware.ts.
+ * Redirects unauthenticated users away from protected pages. This is a UX
+ * convenience, not the real security boundary — RLS is, and every page's data
+ * functions independently call requireActiveStaff() (a full, server-revalidated
+ * auth.getUser() + active-profile check) before touching any data. Called from
+ * middleware.ts/proxy.ts.
+ *
+ * Deliberately uses getSession() here instead of getUser(): getSession() reads
+ * the session from the request cookie locally (refreshing it over the network
+ * only when the token is actually near expiry), while getUser() always makes a
+ * network round trip to revalidate against Supabase's Auth server. Doing that
+ * extra round trip on literally every navigation — on top of the one
+ * requireActiveStaff() already does downstream — was adding ~150-300ms to every
+ * click for a check whose only job here is "redirect if obviously logged out."
  */
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -39,9 +49,9 @@ export async function updateSession(request: NextRequest) {
     });
 
     const {
-      data: { user: supabaseUser },
-    } = await supabase.auth.getUser();
-    user = supabaseUser;
+      data: { session },
+    } = await supabase.auth.getSession();
+    user = session?.user ?? null;
   } catch (error) {
     // Missing env vars or an unreachable Supabase project — degrade to
     // "unauthenticated" (redirect to /login) instead of a hard 500, so a

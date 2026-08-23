@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { Search, UserPlus } from "lucide-react";
 
@@ -19,12 +19,24 @@ export function PatientSearch({ initialResults }: PatientSearchProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Patient[]>(initialResults);
   const [isPending, startTransition] = useTransition();
+  // The server already fetched the empty-query result set (initialResults) as
+  // part of the page render. Track the query that `results` currently reflects
+  // so the effect can skip re-fetching that same query the moment this
+  // component mounts — a plain "first render" boolean doesn't survive React
+  // StrictMode's dev-only double effect invocation (the ref flips to false on
+  // the first invocation and stays false for the immediate second one, so the
+  // guard silently stops guarding); comparing against the actual query value
+  // does, since the value genuinely hasn't changed between those two calls.
+  const lastFetchedQuery = useRef(query);
 
   useEffect(() => {
+    if (query === lastFetchedQuery.current) return;
+
     const timeout = setTimeout(() => {
       startTransition(async () => {
         const data = await searchPatients(query);
         setResults(data);
+        lastFetchedQuery.current = query;
       });
     }, 300);
     return () => clearTimeout(timeout);
