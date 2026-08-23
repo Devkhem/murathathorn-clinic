@@ -7,6 +7,36 @@ documentation conflict, the newest approved decision here wins — update the re
 
 ## Decision
 
+Fixed three stacked sources of per-navigation latency (user reported the app feeling slow/laggy on every
+click): (1) wrapped `requireActiveStaff()` in React's `cache()` so its auth+profile check runs once per request
+instead of once per call site (layout + every page independently called it); (2) switched `proxy.ts`'s session
+check from `getUser()` (always a network round trip to Supabase Auth) to `getSession()` (reads the cookie
+locally); (3) fixed `/patients` re-fetching its own already-server-rendered empty-query result set a second
+time on mount. Then pinned Vercel's deployed functions to `sin1` (Singapore) via `vercel.json` — they were
+running in the `iad1` (US East) default, while Supabase's edge is in/near Bangkok (confirmed via the `cf-ray`
+response header), so every database round trip was crossing the Pacific twice per query.
+
+## Reason
+
+Diagnosed with real measurements, not guesses: a Playwright timing script driving actual navigation, and
+`vercel logs` for the exact error/cause each time. Region mismatch alone accounted for roughly half the
+remaining latency after the round-trip fixes.
+
+## Impact
+
+`src/lib/permissions/index.ts`, `src/lib/supabase/middleware.ts`, `src/features/patients/components/patient-search.tsx`,
+`vercel.json` (new). Measured on production before/after: ~3-4.7s per navigation down to ~1.2-1.7s. Caveat: that
+measurement came from a US-based test client, so it includes that client's own distance to Singapore — a real
+user in Thailand should see it even faster than these numbers suggest.
+
+## Date
+
+2026-08-24
+
+---
+
+## Decision
+
 Compress patient photos client-side (`src/lib/image/compress.ts` — canvas resize to max 1600px + JPEG
 re-encode at quality 0.82) before they're used anywhere, wired into `camera-capture.tsx` so both the face photo
 and ID card photo steps get it automatically. Also raised `next.config.ts`'s
