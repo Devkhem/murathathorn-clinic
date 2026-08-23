@@ -7,6 +7,38 @@ documentation conflict, the newest approved decision here wins — update the re
 
 ## Decision
 
+Fixed `src/lib/supabase/env.ts` to read each `NEXT_PUBLIC_*` env var via a literal `process.env.NEXT_PUBLIC_X`
+property access instead of a shared dynamic `requireEnv(name)` helper that did `process.env[name]`.
+
+## Reason
+
+The user reported "Missing required environment variable NEXT_PUBLIC_SUPABASE_URL" from the live production
+site. Reproduced with a headless-Chromium script driving the actual registration flow: the error fired the
+moment a client component called the browser Supabase client (photo upload), even though the var was
+unquestionably set (confirmed present in `.env.local` and in Vercel's production env store, confirmed baked
+into the client bundle after the fix). Root cause: Next.js's client-bundle env-var inlining only works when its
+compiler can statically match the exact literal `process.env.NEXT_PUBLIC_FOO` at build time — a dynamic
+`process.env[name]` lookup can't be pattern-matched, so it silently resolved to `undefined` in the browser
+while working fine on the server (where `process.env` is the real Node object). A one-helper-fits-all
+abstraction was the wrong shape for this: server-only vars (`SUPABASE_SERVICE_ROLE_KEY`) can use a dynamic
+lookup safely; `NEXT_PUBLIC_*` vars can't.
+
+## Impact
+
+`src/lib/supabase/env.ts` only. No call sites changed (`getSupabaseUrl()` / `getSupabaseAnonKey()` /
+`getSupabaseServiceRoleKey()` keep the same signatures). Verified by grepping the real Supabase URL string into
+the built `.next/static/chunks/*.js` output, then replaying login → photo capture → ID card capture against
+both local dev and the live production deployment with zero console errors. Redeployed to production
+immediately since this broke a live, user-facing flow.
+
+## Date
+
+2026-08-24
+
+---
+
+## Decision
+
 Wired up a real OCR provider for the Thai ID card step: `ClaudeOcrProvider` (`src/lib/ocr/claude-ocr-provider.ts`),
 using Claude's vision input + structured outputs (`client.messages.parse` with a Zod schema, model
 `claude-opus-5`), selected automatically via `getOcrProvider()` when `ANTHROPIC_API_KEY` is set. Uses the same

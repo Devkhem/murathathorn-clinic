@@ -100,8 +100,15 @@ gets used again.
 
 ## Known Issues
 
-- Patient registration flow's full happy path (photo → photo → OCR → phone → review → save → HN) is untested
-  against the live DB — only step 1's render was verified.
+- Patient registration flow's full happy path (photo → photo → OCR → phone → review → save → HN) has NOT been
+  completed with a real save yet — verified through photo capture + OCR (both steps, on production, zero
+  console errors) but not through phone/review/save. **A real production bug was found and fixed along the
+  way**: `src/lib/supabase/env.ts` read `NEXT_PUBLIC_*` vars via a dynamic `process.env[name]` lookup, which
+  Next.js cannot statically inline into the browser bundle — every client-side Supabase call (photo upload
+  during registration, patient/appointment search) threw `Missing required environment variable
+  NEXT_PUBLIC_SUPABASE_URL` in the browser, even though the var was correctly set everywhere. Fixed by using a
+  literal `process.env.NEXT_PUBLIC_SUPABASE_URL` access per var; verified by grepping the real URL into the
+  built client chunk and replaying the flow with zero errors, then redeployed. See `docs/DECISIONS.md`.
 - Appointments: `updateAppointmentStatus` (mark completed/cancelled/no-show) still has no UI hookup.
 - No staff sign-up UI — new staff accounts currently require either the Supabase dashboard or an admin-API
   call like the one used to create the first account.
