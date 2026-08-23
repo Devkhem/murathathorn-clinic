@@ -7,6 +7,36 @@ documentation conflict, the newest approved decision here wins — update the re
 
 ## Decision
 
+Wired up a real OCR provider for the Thai ID card step: `ClaudeOcrProvider` (`src/lib/ocr/claude-ocr-provider.ts`),
+using Claude's vision input + structured outputs (`client.messages.parse` with a Zod schema, model
+`claude-opus-5`), selected automatically via `getOcrProvider()` when `ANTHROPIC_API_KEY` is set. Uses the same
+Anthropic API key that runs this Claude Code session, at the user's explicit choice (offered a separate
+dedicated key as the alternative).
+
+## Reason
+
+The previous `ManualEntryOcrProvider` was always a placeholder — no OCR provider had actually been chosen yet.
+The user asked why ID card reading wasn't working and confirmed they wanted real OCR. Claude's vision API was
+chosen over a dedicated Thai-ID-OCR vendor (e.g. iApp) because it needed no new account/sign-up (an Anthropic
+key already existed in this environment), handles the พ.ศ.→ค.ศ. (Buddhist→Gregorian) year conversion and mixed
+Thai/Latin text in the prompt rather than needing vendor-specific post-processing, and self-reports a confidence
+score the UI already had a slot for.
+
+## Impact
+
+`src/lib/ocr/claude-ocr-provider.ts` (new), `src/lib/ocr/index.ts` (provider selection),
+`.env.example`/`.env.local`/Vercel production env (`ANTHROPIC_API_KEY`). Cost note: every ID card photo now
+costs one Opus-tier vision API call — worth revisiting if per-registration cost matters at scale (a cheaper
+model is a one-line change in `claude-ocr-provider.ts`, traded against extraction accuracy).
+
+## Date
+
+2026-08-24
+
+---
+
+## Decision
+
 Restyled the UI: replaced the default shadcn grayscale theme with a warm herbal-green + gold palette, and added
 a handful of Magic UI (magicui.design) motion components (`ShineBorder`, `AnimatedGradientText`, `BorderBeam`,
 `NumberTicker`, `Confetti`), applied only to low-frequency/decorative moments — the login card, the single

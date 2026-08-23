@@ -32,7 +32,11 @@ Acceptance Criteria:
 
 - [x] capture patient face photo
 - [x] capture Thai ID card photo
-- [x] OCR abstraction implemented (`ManualEntryOcrProvider` stub wired; a real provider is a drop-in in `lib/ocr`)
+- [x] OCR abstraction implemented — now backed by **Claude's vision API**
+      (`lib/ocr/claude-ocr-provider.ts`, structured outputs via `messages.parse` + Zod), with
+      `ManualEntryOcrProvider` as the zero-config fallback. Plumbing verified with a synthetic test image
+      (correctly returned empty fields + 0 confidence rather than hallucinating); **not yet tested with an
+      actual Thai ID card photo**.
 - [x] input phone number
 - [x] patient data preview / edit step
 - [x] duplicate patient detection (citizen ID → phone → name+birthdate, with the
