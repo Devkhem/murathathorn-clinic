@@ -6,18 +6,21 @@ Status values: `TODO`, `IN PROGRESS`, `BLOCKED`, `DONE` (move to `tasks/DONE.md`
 
 ## INFRA-002 Deploy to a public URL
 
-Status: IN PROGRESS
+Status: IN PROGRESS — live at https://murathathorn-clinic.vercel.app
 
 Objective: Get the app reachable from a real device on a real network (not just `localhost` on the developer's
 machine), so the actual end-user can use it.
 
 Acceptance Criteria:
 
-- [ ] push the repo to GitHub
-- [ ] connect to Vercel, set `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` /
-      `SUPABASE_SERVICE_ROLE_KEY` as env vars there
-- [ ] update Supabase project's Auth "Site URL" / redirect allowlist to the production domain
-- [ ] confirm login + dashboard load on the production URL
+- [x] push the repo to GitHub (`Devkhem/murathathorn-clinic`, private)
+- [x] connect to Vercel (`dodedonat-1048s-projects/murathathorn-clinic`), set `NEXT_PUBLIC_SUPABASE_URL` /
+      `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` as production env vars
+- [x] confirm login + dashboard load on the production URL — screenshotted, matches local exactly
+- [ ] update Supabase project's Auth "Site URL" / redirect allowlist to the production domain (still set to
+      whatever the default/localhost was — matters once email invites/magic-links are used again)
+- [ ] connect GitHub → Vercel auto-deploy (the Vercel GitHub App needs a one-time browser authorization the CLI
+      couldn't complete non-interactively; deploys currently have to be triggered manually via `vercel --prod`)
 
 ## PAT-001 Patient Registration
 
