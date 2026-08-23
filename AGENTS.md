@@ -8,9 +8,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# Clinic Mae — Agent Instructions
+# Murathathorn Clinic — Agent Instructions
 
-Clinic Mae is a clinic management app built for a small clinic run by an **older adult, non-technical user**.
+Murathathorn Clinic is a clinic management app built for a small clinic run by an **older adult, non-technical user**.
 It is developed collaboratively:
 
 - **ChatGPT** — Product Architect / System Designer / Reviewer

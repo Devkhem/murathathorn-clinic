@@ -7,7 +7,7 @@ the prior conversation. Read this, then [tasks/TODO.md](../tasks/TODO.md), befor
 
 ## Completed
 
-Bootstrapped Clinic Mae from nothing: Next.js + TypeScript + Tailwind + shadcn/ui app, the full collaboration
+Bootstrapped Murathathorn Clinic from nothing: Next.js + TypeScript + Tailwind + shadcn/ui app, the full collaboration
 doc set, the Supabase schema/RLS/storage design, Supabase auth wiring, the 4-item dashboard shell, and a working
 (code-complete, not yet live-DB-verified) Patient Registration flow plus first passes at Patient Search/Profile,
 Treatment History, and Appointments.

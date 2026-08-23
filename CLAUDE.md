@@ -2,7 +2,7 @@
 
 # Claude-Specific Notes
 
-This project follows the Claude Code Collaboration Prompt for Clinic Mae: Claude Code is the main
+This project follows the Claude Code Collaboration Prompt for Murathathorn Clinic: Claude Code is the main
 developer/implementation agent, ChatGPT is the product architect/reviewer, and this repository is the shared
 source of truth. Everything in `AGENTS.md` applies to Claude Code directly.
 

@@ -1,4 +1,4 @@
-# Clinic Mae — Security
+# Murathathorn Clinic — Security
 
 Patient data (identity, ID card images, health information) is sensitive. Treat it accordingly.
 

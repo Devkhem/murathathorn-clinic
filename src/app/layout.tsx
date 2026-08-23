@@ -10,8 +10,8 @@ const notoSansThai = Noto_Sans_Thai({
 });
 
 export const metadata: Metadata = {
-  title: "คลินิกแม่",
-  description: "ระบบจัดการคลินิกแบบง่าย สำหรับคลินิกแม่",
+  title: "มุรทาธรคลินิกแพทย์แผนไทย",
+  description: "ระบบจัดการคลินิกแบบง่าย สำหรับมุรทาธรคลินิกแพทย์แผนไทย",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

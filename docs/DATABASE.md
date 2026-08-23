@@ -1,4 +1,4 @@
-# Clinic Mae — Database
+# Murathathorn Clinic — Database
 
 Status: Living document. Source of truth for schema is `supabase/migrations/`; this file explains and indexes it.
 Any schema change must ship as a new migration file **and** an update to this document.

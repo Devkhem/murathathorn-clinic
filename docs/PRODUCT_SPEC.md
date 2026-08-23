@@ -1,8 +1,8 @@
-# Clinic Mae — Product Specification
+# Murathathorn Clinic — Product Specification
 
 Status: Living document. Update this file whenever product behavior changes; log the change in [DECISIONS.md](DECISIONS.md).
 
-## What Clinic Mae Is
+## What Murathathorn Clinic Is
 
 A very simple clinic management app for a small clinic, built for an **older adult, non-technical user**. It is not
 hospital software. It should feel like a consumer app: big buttons, big Thai text, few screens, almost no typing.

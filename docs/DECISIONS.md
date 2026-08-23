@@ -1,7 +1,32 @@
-# Clinic Mae — Decisions Log
+# Murathathorn Clinic — Decisions Log
 
 Append-only log of architecture/product decisions. Newest entries at the top. When ChatGPT and previous
 documentation conflict, the newest approved decision here wins — update the relevant doc to match.
+
+---
+
+## Decision
+
+Renamed the project from the placeholder "Clinic Mae" / "คลินิกแม่" to the real clinic name,
+**Murathathorn Clinic (มุรทาธรคลินิกแพทย์แผนไทย)**. This covers the project/folder name, `package.json`
+(`murathathorn-clinic`), the `supabase/config.toml` local project id, all documentation, and the on-screen Thai
+brand name (login page, dashboard header, page metadata).
+
+## Reason
+
+"Clinic Mae" was a placeholder name carried over from the initial collaboration brief, not the actual clinic's
+name. The clinic operator provided the real name and asked for a full rename, including the folder/package, not
+just the on-screen text.
+
+## Impact
+
+The project directory moved from `~/Documents/clinic-mae` to `~/Documents/murathathorn-clinic` — any saved
+paths, terminal `cd` history, or editor workspaces pointing at the old location need to be updated. No Supabase
+project was connected yet at rename time, so there is no remote project name to reconcile.
+
+## Date
+
+2026-08-23
 
 ---
 

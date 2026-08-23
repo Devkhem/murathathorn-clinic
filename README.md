@@ -1,4 +1,4 @@
-# Clinic Mae (คลินิกแม่)
+# Murathathorn Clinic (มุรทาธรคลินิกแพทย์แผนไทย)
 
 A very simple clinic management app, built for an older adult, non-technical clinic staff user. Next.js (App
 Router) + TypeScript + Tailwind + shadcn/ui + Supabase.

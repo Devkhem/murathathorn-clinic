@@ -22,9 +22,9 @@ export default async function DashboardLayout({ children }: LayoutProps<"/">) {
       <MainNav />
 
       <div className="flex flex-1 flex-col pb-20 md:pb-0 md:pl-24">
-        <header className="flex items-center justify-between border-b bg-card px-6 py-4">
-          <h1 className="text-2xl font-bold">คลินิกแม่</h1>
-          <div className="flex items-center gap-3">
+        <header className="flex items-center justify-between gap-3 border-b bg-card px-6 py-4">
+          <h1 className="min-w-0 truncate text-lg font-bold sm:text-2xl">มุรทาธรคลินิกแพทย์แผนไทย</h1>
+          <div className="flex shrink-0 items-center gap-3">
             {staffName && <span className="hidden text-muted-foreground sm:inline">{staffName}</span>}
             <LogoutButton />
           </div>
