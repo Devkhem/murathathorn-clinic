@@ -7,6 +7,35 @@ documentation conflict, the newest approved decision here wins — update the re
 
 ## Decision
 
+Restyled the UI: replaced the default shadcn grayscale theme with a warm herbal-green + gold palette, and added
+a handful of Magic UI (magicui.design) motion components (`ShineBorder`, `AnimatedGradientText`, `BorderBeam`,
+`NumberTicker`, `Confetti`), applied only to low-frequency/decorative moments — the login card, the single
+primary quick-action card on the home page, and a new post-save success screen in the patient registration
+wizard. Deliberately kept out of the actual data-entry steps of the registration wizard and every other
+transactional form.
+
+## Reason
+
+The user asked for a nicer-looking UI and specifically mentioned Magic UI. The product philosophy
+(`docs/PRODUCT_SPEC.md`) prioritizes calm, low-distraction screens for an older-adult primary user, so motion
+was scoped to places where a moment of delight doesn't compete with a task in progress — most importantly, a
+clear "it worked" moment right after saving a new patient (confetti + HN reveal), which also directly serves
+the existing "provide clear confirmations" requirement rather than fighting it.
+
+## Impact
+
+`src/app/globals.css` (theme tokens), `src/components/ui/*` (5 new vendored Magic UI files), `src/app/login/page.tsx`,
+`src/app/(dashboard)/page.tsx`, and a new `success-step.tsx` in the registration wizard. See
+`docs/AI_HANDOFF.md` for the full file list and the Base UI `nativeButton` gotcha this surfaced.
+
+## Date
+
+2026-08-23
+
+---
+
+## Decision
+
 Renamed the project from the placeholder "Clinic Mae" / "คลินิกแม่" to the real clinic name,
 **Murathathorn Clinic (มุรทาธรคลินิกแพทย์แผนไทย)**. This covers the project/folder name, `package.json`
 (`murathathorn-clinic`), the `supabase/config.toml` local project id, all documentation, and the on-screen Thai

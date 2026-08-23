@@ -4,9 +4,24 @@ Status values: `TODO`, `IN PROGRESS`, `BLOCKED`, `DONE` (move to `tasks/DONE.md`
 
 ---
 
+## INFRA-002 Deploy to a public URL
+
+Status: IN PROGRESS
+
+Objective: Get the app reachable from a real device on a real network (not just `localhost` on the developer's
+machine), so the actual end-user can use it.
+
+Acceptance Criteria:
+
+- [ ] push the repo to GitHub
+- [ ] connect to Vercel, set `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` /
+      `SUPABASE_SERVICE_ROLE_KEY` as env vars there
+- [ ] update Supabase project's Auth "Site URL" / redirect allowlist to the production domain
+- [ ] confirm login + dashboard load on the production URL
+
 ## PAT-001 Patient Registration
 
-Status: IN PROGRESS — code complete, blocked on a live Supabase project to verify end-to-end.
+Status: IN PROGRESS — connected to a live Supabase project; full happy path not yet walked end-to-end.
 
 Objective: Allow clinic staff to register a new patient with minimal typing.
 
@@ -18,29 +33,31 @@ Acceptance Criteria:
 - [x] input phone number
 - [x] patient data preview / edit step
 - [x] duplicate patient detection (citizen ID → phone → name+birthdate, with the
-      "พบคนไข้ที่อาจเป็นคนเดียวกัน" dialog) — implemented, not yet run against a live DB
+      "พบคนไข้ที่อาจเป็นคนเดียวกัน" dialog)
 - [x] HN generated automatically (server-side `generate_hn()` function)
 - [x] privacy acknowledgement recorded
-- [ ] end-to-end save verified against a real Supabase project (needs `.env.local` credentials — see
-      [docs/AI_HANDOFF.md](../docs/AI_HANDOFF.md))
+- [x] a clear post-save confirmation screen (HN reveal + confetti, `success-step.tsx`)
+- [ ] the full 4-step flow (photo → photo → OCR → phone → review → save) walked start-to-finish against the
+      live DB with a real photo upload — only step 1's render has been verified so far
 
 ## PAT-002 Patient Search + Patient Profile
 
-Status: IN PROGRESS — code complete, blocked on the same live-DB verification as PAT-001.
+Status: IN PROGRESS — search verified against live DB (empty-state render confirmed); profile page untested
+(no patients exist yet).
 
 Objective: Find a patient quickly and see their profile on one screen.
 
 Acceptance Criteria:
 
-- [x] search by name / HN / phone (`/patients`)
+- [x] search by name / HN / phone (`/patients`) — verified rendering against live Supabase
 - [x] patient profile shows photo, name, HN, age, phone, allergies, chronic conditions (`/patients/[id]`)
 - [x] `+ บันทึกการรักษาวันนี้` primary action
 - [x] treatment history timeline on the same page
-- [ ] verified against a live Supabase project
+- [ ] profile page verified with an actual patient record (blocked on PAT-001's remaining item)
 
 ## VISIT-001 Treatment History
 
-Status: IN PROGRESS — code complete, blocked on the same live-DB verification.
+Status: IN PROGRESS — code complete, blocked on having a real patient to attach a visit to.
 
 Objective: Record a treatment visit without ever overwriting past visits.
 
@@ -49,46 +66,54 @@ Acceptance Criteria:
 - [x] create visit form (chief complaint, diagnosis, notes) — `AddVisitDialog`
 - [x] visits are append-only, shown newest-first
 - [x] audit log entry on every visit create (DB trigger, `visits_audit`)
-- [ ] verified against a live Supabase project
+- [ ] verified against a live Supabase project with a real visit created
 
 ## APPT-001 Appointments
 
-Status: IN PROGRESS — basic version implemented; status-change UI still missing.
+Status: IN PROGRESS — list view verified against live DB (empty-state render confirmed); create flow untested.
 
 Objective: Schedule and track appointments per patient.
 
 Acceptance Criteria:
 
 - [x] create appointment tied to a patient (`/appointments/new`)
-- [x] appointment list (`/appointments`)
+- [x] appointment list (`/appointments`) — verified rendering against live Supabase
 - [ ] UI to transition status (scheduled → completed/cancelled/no_show) — `updateAppointmentStatus` action
       exists but nothing in the UI calls it yet
-- [ ] verified against a live Supabase project
+- [ ] create flow verified end-to-end (needs a real patient to attach to, same blocker as VISIT-001)
 
 ## SEC-001 Security Review + UX Polish
 
-Status: TODO
+Status: IN PROGRESS
 
 Objective: Final pass once Phases 1-5 are functionally complete and running against a real project.
 
 Acceptance Criteria:
 
-- [ ] RLS policy audit against `docs/SECURITY.md` checklist, run with a real project (`supabase db push` +
-      manual policy tests)
+- [ ] RLS policy audit against `docs/SECURITY.md` checklist — schema is live, policies applied, but not
+      manually adversarially tested (e.g. confirm an unauthenticated request is actually denied)
 - [ ] confirm no service-role key reachable from client bundle (spot-check `npm run build` output)
 - [ ] confirm ID card views are audited (manually view an ID card, check `audit_logs`)
 - [ ] accessibility / large-text / iPad pass with an actual older-adult test user if possible
+- [x] logout requires explicit confirmation (prevents an accidental tap from force-logging-out the primary,
+      non-technical end-user)
 
-## INFRA-001 Connect a real Supabase project
+## AUTH-001 Staff sign-up / invite flow
 
-Status: TODO — blocking everything above from being verified end-to-end.
+Status: TODO
 
-Objective: Get the app running against a real backend so Phase 2+ can actually be tested.
+Objective: A real way to onboard additional staff accounts without a developer running Admin API calls by hand.
 
 Acceptance Criteria:
 
-- [ ] create a Supabase project
-- [ ] `npx supabase link --project-ref <ref>` and `npx supabase db push` to apply `supabase/migrations/`
-- [ ] fill in `.env.local` from `.env.example`
-- [ ] create the first staff account (becomes admin automatically) and confirm login works
-- [ ] walk the full patient registration flow on an iPad
+- [ ] resolve why the Supabase invite email didn't arrive/wasn't found for the first account (deliverability
+      vs. user error — see `docs/AI_HANDOFF.md` Known Issues)
+- [ ] an admin-only "add staff" screen in the app (currently `/auth/confirm` + `/auth/set-password` exist and
+      handle the email-link side, but nothing in the UI triggers an invite)
+
+---
+
+## Done (see tasks/DONE.md for the full write-up)
+
+- ~~INFRA-001 Connect a real Supabase project~~ — done: project `krvnrujesubfpjxxeqmt` connected, all 7
+  migrations applied, first admin account created and login verified end-to-end.

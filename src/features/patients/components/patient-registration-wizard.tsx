@@ -15,6 +15,7 @@ import { FacePhotoStep } from "./registration-steps/face-photo-step";
 import { IdCardStep } from "./registration-steps/id-card-step";
 import { PhoneStep } from "./registration-steps/phone-step";
 import { ReviewStep, type ReviewFields } from "./registration-steps/review-step";
+import { SuccessStep } from "./registration-steps/success-step";
 import { DuplicateWarningDialog } from "./duplicate-warning-dialog";
 
 type Step = "face" | "id_card" | "phone" | "review";
@@ -51,6 +52,7 @@ export function PatientRegistrationWizard() {
   const [privacyAcknowledged, setPrivacyAcknowledged] = useState(false);
 
   const [duplicates, setDuplicates] = useState<DuplicateMatch[] | null>(null);
+  const [createdPatient, setCreatedPatient] = useState<{ id: string; hn: string } | null>(null);
   const [pendingUploads, setPendingUploads] = useState<{
     facePhotoPath: string;
     idCardPhotoPath: string;
@@ -155,13 +157,23 @@ export function PatientRegistrationWizard() {
         }
 
         setDuplicates(null);
-        toast.success(`บันทึกคนไข้ใหม่สำเร็จ HN ${result.patient?.hn}`);
-        router.push(`/patients/${result.patient?.id}`);
+        if (result.patient) {
+          setCreatedPatient(result.patient);
+        }
       } catch (error) {
         console.error("Failed to save patient", error);
         toast.error(error instanceof Error ? error.message : "บันทึกข้อมูลไม่สำเร็จ");
       }
     });
+  }
+
+  if (createdPatient) {
+    return (
+      <SuccessStep
+        hn={createdPatient.hn}
+        onContinue={() => router.push(`/patients/${createdPatient.id}`)}
+      />
+    );
   }
 
   return (

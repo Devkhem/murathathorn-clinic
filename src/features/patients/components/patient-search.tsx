@@ -42,7 +42,7 @@ export function PatientSearch({ initialResults }: PatientSearchProps) {
             className="h-14 pl-12 text-lg"
           />
         </div>
-        <Button render={<Link href="/patients/new" />} size="lg" className="h-14 gap-2 text-lg">
+        <Button render={<Link href="/patients/new" />} nativeButton={false} size="lg" className="h-14 gap-2 text-lg">
           <UserPlus className="size-5" />
           <span className="hidden sm:inline">เพิ่มคนไข้</span>
         </Button>
